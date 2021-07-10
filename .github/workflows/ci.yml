@@ -12,14 +12,26 @@ jobs:
       uses: actions/setup-go@v1
       with:
         go-version: ${{ matrix.go-version }}
+
+    - name: setup Docker
+      uses: docker-practice/actions-setup-docker@master
+
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Test
       run: |
-        diff -u <(echo -n) <(gofmt -d $(find . -type f -name '*.go' -not -path "./vendor/*")) 
+        diff -u <(echo -n) <(gofmt -d $(find . -type f -name '*.go'))
         make && make test
         cd ./auto && bash -x ci_pipeline.sh
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
       with:
         file: ./coverage.txt
+
+  # Only  build image for test  as docker support is  not production available
+    - name: Build Image
+      run: |
+        make build-image
+
+
+
